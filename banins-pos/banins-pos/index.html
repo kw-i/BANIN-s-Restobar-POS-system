@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banin's Restobar POS — Login</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="card login-card">
+      <h1>🍻 Banin's Restobar</h1>
+      <p class="hint">Sign in to start taking orders.</p>
+      <input id="email" type="email" placeholder="Email" autocomplete="username" />
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+      <div class="error" id="error"></div>
+      <button id="loginBtn" style="width:100%">Sign in</button>
+      <p class="hint" style="margin-top:14px">
+        First time here? <a href="#" id="showSignup">Create a staff account</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

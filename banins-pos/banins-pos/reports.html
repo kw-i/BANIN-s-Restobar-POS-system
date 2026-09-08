@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banin's Restobar POS — Reports</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <h1>🍻 Banin's Restobar</h1>
+    <nav>
+      <a href="pos.html">Tabs</a>
+      <a href="reports.html" class="active">Reports</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="filter-row" id="filterRow">
+      <button data-range="day" class="active">Daily</button>
+      <button data-range="week">Weekly</button>
+      <button data-range="month">Monthly</button>
+      <button data-range="year">Yearly</button>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="label">Total Sales</div>
+        <div class="value" id="statTotal">₱0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Tabs Closed</div>
+        <div class="value" id="statCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Average Tab</div>
+        <div class="value" id="statAvg">₱0.00</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Sales by period</h3>
+      <table>
+        <thead><tr><th>Period</th><th>Tabs</th><th>Sales</th></tr></thead>
+        <tbody id="periodTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">Closed tabs in range</h3>
+      <table>
+        <thead><tr><th>Tab</th><th>Closed</th><th>Items</th><th>Total</th></tr></thead>
+        <tbody id="tabsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>

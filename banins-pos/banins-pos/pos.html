@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banin's Restobar POS</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <h1>🍻 Banin's Restobar</h1>
+    <nav>
+      <a href="pos.html" class="active">Tabs</a>
+      <a href="reports.html">Reports</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <div class="sync-indicator" id="syncStatus">All synced</div>
+      <div style="display:flex; gap:10px;">
+        <button class="secondary" id="refreshBtn">↻ Refresh</button>
+        <button id="newTabBtn">+ New Tab</button>
+      </div>
+    </div>
+
+    <div id="tabsGrid" class="tabs-grid"></div>
+    <div id="emptyState" class="empty" style="display:none">No open tabs. Start one with "+ New Tab".</div>
+  </div>
+
+  <!-- Tab detail modal -->
+  <div class="modal-backdrop" id="tabModal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <input id="tabLabelInput" style="margin:0; font-size:16px; font-weight:700;" />
+        </div>
+        <button class="ghost" id="closeModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="menu-grid" id="menuGrid"></div>
+        <div id="orderList"></div>
+        <div class="total-line">
+          <span>Total</span>
+          <span id="tabTotal">₱0.00</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="danger" id="deleteTabBtn">Delete Tab</button>
+        <div style="display:flex; gap:10px;">
+          <button class="secondary" id="doneBtn">Done</button>
+          <button id="closeTabBtn">Close / Pay Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/pos.js"></script>
+</body>
+</html>
