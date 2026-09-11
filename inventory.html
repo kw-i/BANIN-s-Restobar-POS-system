@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banin's Restobar POS — Inventory</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <h1>🍻 Banin's Restobar</h1>
+    <nav>
+      <a href="pos.html">Tabs</a>
+      <a href="reports.html" data-admin-only>Reports</a>
+      <a href="accounting.html" data-admin-only>Accounting</a>
+      <a href="inventory.html" class="active" data-admin-only>Inventory</a>
+      <a href="#" id="logoutLink">Sign out</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <h3 style="margin:0">Menu &amp; stock</h3>
+      <button id="addItemBtn">+ Add menu item</button>
+    </div>
+    <p class="hint">Stock counts go down automatically each time an item is added to a tab. Edit a number directly to correct it (e.g. after a delivery).</p>
+
+    <table>
+      <thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+      <tbody id="menuTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Add item modal -->
+  <div class="modal-backdrop" id="addModal" style="display:none">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <div style="font-weight:700">Add menu item</div>
+        <button class="ghost" id="addModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <input id="newName" placeholder="Item name" />
+        <input id="newPrice" type="number" step="0.01" min="0" placeholder="Price" />
+        <input id="newCategory" placeholder="Category (e.g. Beer, Food)" />
+        <input id="newStock" type="number" step="1" min="0" placeholder="Starting stock" />
+        <div class="error" id="addError"></div>
+      </div>
+      <div class="modal-footer" style="justify-content:flex-end">
+        <button class="secondary" id="addCancel">Cancel</button>
+        <button id="addConfirm">Add item</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/inventory.js"></script>
+</body>
+</html>

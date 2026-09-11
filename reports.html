@@ -11,7 +11,9 @@
     <h1>🍻 Banin's Restobar</h1>
     <nav>
       <a href="pos.html">Tabs</a>
-      <a href="reports.html" class="active">Reports</a>
+      <a href="reports.html" class="active" data-admin-only>Reports</a>
+      <a href="accounting.html" data-admin-only>Accounting</a>
+      <a href="inventory.html" data-admin-only>Inventory</a>
       <a href="#" id="logoutLink">Sign out</a>
     </nav>
   </div>
@@ -58,6 +60,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/reports.js"></script>
 </body>
 </html>

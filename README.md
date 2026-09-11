@@ -49,7 +49,22 @@ and `tab_items` tables, turns on Row Level Security, and seeds a starter
 menu (edit or delete those sample rows any time — from the SQL editor, or
 build a small "Menu" admin page later if you want one in-app).
 
-### 3. Turn off email confirmation (optional but recommended for a small team)
+### 3. Run the feature-update migration
+Run `feature_update.sql` too (same place, SQL Editor → New query → paste → Run).
+This adds inventory stock tracking, the expenses table, and tightens
+permissions so employees can only see open tabs — closed tabs, the menu
+editor, and expenses are admin-only from here on.
+
+### 4. Make yourself an admin
+By default every new signup is an **employee** (can only use the Tabs
+screen). To promote an account to **admin** (sees Reports, Accounting,
+Inventory too), run in the SQL Editor:
+```sql
+update public.staff set role = 'admin' where id =
+  (select id from auth.users where email = 'you@example.com');
+```
+
+### 5. Turn off email confirmation (optional but recommended for a small team)
 Dashboard → **Authentication → Providers → Email** → turn off "Confirm
 email". Otherwise each new staff account has to click a confirmation email
 before they can sign in.
