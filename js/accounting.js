@@ -5,17 +5,15 @@ let session = null;
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) { window.location.href = "index.html"; return; }
   session = data.session;
+  const ok = await requireApproved(session);
+  if (!ok) return;
   const isAdmin = await requireAdmin(session);
   if (!isAdmin) return;
   applyNavVisibility(session);
+  initProfileMenu(session);
+  startHeartbeat(session);
   await loadAccounting(currentRange);
 })();
-
-document.getElementById("logoutLink").addEventListener("click", async (e) => {
-  e.preventDefault();
-  await supabaseClient.auth.signOut();
-  window.location.href = "index.html";
-});
 
 document.getElementById("filterRow").addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-range]");

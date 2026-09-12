@@ -3,17 +3,15 @@ let currentRange = "day";
 (async function init() {
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) { window.location.href = "index.html"; return; }
+  const ok = await requireApproved(data.session);
+  if (!ok) return;
   const isAdmin = await requireAdmin(data.session);
   if (!isAdmin) return;
   applyNavVisibility(data.session);
+  initProfileMenu(data.session);
+  startHeartbeat(data.session);
   await loadReport(currentRange);
 })();
-
-document.getElementById("logoutLink").addEventListener("click", async (e) => {
-  e.preventDefault();
-  await supabaseClient.auth.signOut();
-  window.location.href = "index.html";
-});
 
 document.getElementById("filterRow").addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-range]");

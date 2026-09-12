@@ -14,7 +14,18 @@
       <a href="reports.html" data-admin-only>Reports</a>
       <a href="accounting.html" class="active" data-admin-only>Accounting</a>
       <a href="inventory.html" data-admin-only>Inventory</a>
-      <a href="#" id="logoutLink">Sign out</a>
+      <a href="employees.html" data-admin-only>Employees</a>
+      <div class="profile-menu">
+        <button class="secondary" id="profileBtn">👤 <span id="profileName">Account</span> ▾</button>
+        <div class="dropdown" id="profileDropdown">
+          <div class="dropdown-header" id="dropdownName"></div>
+          <div class="dropdown-sub" id="dropdownEmail"></div>
+          <hr/>
+          <a href="#" id="changePasswordLink">Change Password</a>
+          <a href="#" id="themeToggleLink">🌙 Dark mode</a>
+          <a href="#" id="signOutLink" class="danger-link">Sign out</a>
+        </div>
+      </div>
     </nav>
   </div>
 

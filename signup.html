@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Account — Banin's Restobar</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="card login-card" style="width:360px">
+      <h1>🍻 Join the team</h1>
+      <p class="hint" id="hint">Fill this in and an admin will review your account.</p>
+
+      <div id="formArea">
+        <input id="fullName" type="text" placeholder="Full name" autocomplete="name" />
+        <input id="phone" type="tel" placeholder="Phone number" autocomplete="tel" />
+        <input id="email" type="email" placeholder="Email" autocomplete="username" />
+        <input id="password" type="password" placeholder="Password" autocomplete="new-password" />
+        <input id="confirmPassword" type="password" placeholder="Confirm password" autocomplete="new-password" />
+        <div class="error" id="error"></div>
+        <button id="signupBtn" style="width:100%">Create account</button>
+      </div>
+
+      <p class="hint" style="margin-top:14px">
+        Already have an account? <a href="index.html">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>

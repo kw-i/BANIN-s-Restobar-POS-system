@@ -31,7 +31,12 @@ const deviceId = getDeviceId();
   if (!data.session) { window.location.href = "index.html"; return; }
   state.session = data.session;
 
+  const ok = await requireApproved(state.session);
+  if (!ok) return;
   applyNavVisibility(state.session);
+  initProfileMenu(state.session);
+  startHeartbeat(state.session);
+
   await Promise.all([loadMenu(), loadOpenTabs()]);
   await cleanupStaleTabs();
   render();
@@ -44,12 +49,6 @@ const deviceId = getDeviceId();
     render();
   }, 5 * 60 * 1000);
 })();
-
-document.getElementById("logoutLink").addEventListener("click", async (e) => {
-  e.preventDefault();
-  await supabaseClient.auth.signOut();
-  window.location.href = "index.html";
-});
 
 document.getElementById("refreshBtn").addEventListener("click", async () => {
   await loadOpenTabs();
@@ -83,7 +82,7 @@ async function loadOpenTabs() {
   for (const t of tabs) {
     newTabs[t.id] = {
       id: t.id, label: t.label, status: t.status, total: Number(t.total),
-      createdAt: t.created_at,
+      createdAt: t.created_at, notes: t.notes || "",
       items: items.filter(i => i.tab_id === t.id).map(mapItemRow),
     };
   }
@@ -175,13 +174,14 @@ function render() {
 // ---------- create tab (starts as a draft — nothing saved yet) ----------
 function createTab() {
   const id = crypto.randomUUID();
-  state.draft = { id, label: `Tab ${Object.keys(state.tabs).length + 1}`, items: [], total: 0 };
+  state.draft = { id, label: `Tab ${Object.keys(state.tabs).length + 1}`, items: [], total: 0, notes: "" };
   state.openTabModal = "draft";
   state.editedSinceOpen = false;
 
   document.getElementById("tabModal").style.display = "flex";
   document.getElementById("tabLabelInput").value = state.draft.label;
   document.getElementById("tabOpenedAt").textContent = "";
+  document.getElementById("tabNotes").value = "";
   renderMenuGrid();
   renderOrderList();
 }
@@ -193,6 +193,7 @@ function openTabModal(id) {
   document.getElementById("tabModal").style.display = "flex";
   document.getElementById("tabLabelInput").value = t.label;
   document.getElementById("tabOpenedAt").textContent = `Opened ${formatTime(t.createdAt)}`;
+  document.getElementById("tabNotes").value = t.notes || "";
   renderMenuGrid();
   renderOrderList();
 }
@@ -217,6 +218,17 @@ document.getElementById("tabLabelInput").addEventListener("change", (e) => {
   if (state.openTabModal !== "draft") {
     state.editedSinceOpen = true;
     syncOp(() => supabaseClient.from("tabs").update({ label: t.label }).eq("id", t.id));
+    updateFooterButtons();
+  }
+});
+
+document.getElementById("tabNotes").addEventListener("change", (e) => {
+  const t = getCurrentTab();
+  if (!t) return;
+  t.notes = e.target.value;
+  if (state.openTabModal !== "draft") {
+    state.editedSinceOpen = true;
+    syncOp(() => supabaseClient.from("tabs").update({ notes: t.notes }).eq("id", t.id));
     updateFooterButtons();
   }
 });
@@ -255,7 +267,7 @@ function addItemToTab(menuItem) {
     state.openTabModal = t.id;
     document.getElementById("tabOpenedAt").textContent = `Opened ${formatTime(t.createdAt)}`;
     syncOp(() => supabaseClient.from("tabs").insert({
-      id: t.id, label: t.label, status: "open", total: t.total,
+      id: t.id, label: t.label, status: "open", total: t.total, notes: t.notes || "",
       opened_by: state.session.user.id, device_id: deviceId,
     }));
   } else {
@@ -267,7 +279,6 @@ function addItemToTab(menuItem) {
     name: item.name, price: item.price, qty: item.qty,
     created_by: state.session.user.id, device_id: deviceId,
   }));
-  decrementStock(menuItem.id, 1);
 
   state.editedSinceOpen = true;
   renderOrderList();
@@ -285,7 +296,6 @@ function changeQty(itemId, delta) {
   } else {
     syncOp(() => supabaseClient.from("tab_items").update({ qty: item.qty }).eq("id", itemId));
   }
-  if (item.menu_item_id) decrementStock(item.menu_item_id, delta);
   recalcTotal(t);
   state.editedSinceOpen = true;
   renderOrderList();
@@ -295,16 +305,20 @@ function changeQty(itemId, delta) {
   }
 }
 
-// Best-effort stock decrement — inventory is informational, so a
-// failed decrement (e.g. offline) doesn't block taking the order.
-function decrementStock(menuItemId, qtyDelta) {
-  const menuItem = state.menu.find(m => m.id === menuItemId);
-  if (!menuItem) return;
-  menuItem.stock_qty = Math.max(0, (menuItem.stock_qty || 0) - qtyDelta);
-  syncOp(() => supabaseClient
-    .from("menu_items")
-    .update({ stock_qty: menuItem.stock_qty })
-    .eq("id", menuItemId));
+// Stock only leaves inventory once a tab is actually paid out — not
+// while items are still being added/removed on an open tab, since
+// those might get cancelled. Called once, right when a tab closes.
+function applyStockDecrementsForTab(tab) {
+  for (const item of tab.items) {
+    if (!item.menu_item_id) continue;
+    const menuItem = state.menu.find(m => m.id === item.menu_item_id);
+    if (!menuItem) continue;
+    menuItem.stock_qty = Math.max(0, (menuItem.stock_qty || 0) - item.qty);
+    syncOp(() => supabaseClient
+      .from("menu_items")
+      .update({ stock_qty: menuItem.stock_qty })
+      .eq("id", item.menu_item_id));
+  }
 }
 
 function recalcTotal(t) {
@@ -367,6 +381,7 @@ document.getElementById("closeTabBtn").addEventListener("click", async () => {
   const paid = await showPaymentModal(t);
   if (!paid) return;
 
+  applyStockDecrementsForTab(t);
   t.status = "closed";
   const closedAt = new Date().toISOString();
   delete state.tabs[t.id];

@@ -49,11 +49,10 @@ and `tab_items` tables, turns on Row Level Security, and seeds a starter
 menu (edit or delete those sample rows any time — from the SQL editor, or
 build a small "Menu" admin page later if you want one in-app).
 
-### 3. Run the feature-update migration
-Run `feature_update.sql` too (same place, SQL Editor → New query → paste → Run).
-This adds inventory stock tracking, the expenses table, and tightens
-permissions so employees can only see open tabs — closed tabs, the menu
-editor, and expenses are admin-only from here on.
+### 3. Run the feature-update migrations
+Run these two files, in order, the same way (SQL Editor → New query → paste → Run):
+1. `feature_update.sql` — inventory stock, expenses table, tightens permissions so employees only see open tabs.
+2. `feature_update_2.sql` — adds the sign-up approval workflow, tab notes, and staff activity tracking.
 
 ### 4. Make yourself an admin
 By default every new signup is an **employee** (can only use the Tabs
@@ -119,3 +118,42 @@ terminals) hitting the same site.
   stays correct on that screen, but the background sync will fail silently
   until you refresh — worth keeping an eye on the sync indicator during a
   spotty connection.
+
+## New: sign-up & approval workflow
+
+Signing up now happens on its own page (`signup.html`) and asks for full
+name, phone, email, and password. New accounts start **unapproved** — they
+can create a login, but can't actually get into the app until an admin
+approves them on the new **Employees** page (visible in the nav to admins
+only). That page shows every employee's name, phone, role, whether they're
+currently active (seen in the last 3 minutes), when they last signed in,
+and a "View Activity" button listing tabs they've opened/closed with
+timestamps.
+
+**Important limitation:** approving someone just flips a flag in the
+database — there's no automatic "you're approved!" email sent, because
+sending email securely requires a backend with a private API key, which a
+plain static site can't hold safely. For now, let the person know directly
+(text, Slack, whatever) once you've approved them. If you want the
+automatic email later, that's a small Supabase Edge Function away — happy
+to help set that up if/when you want it.
+
+To permanently remove an unwanted sign-up (not just leave it unapproved),
+delete it from Supabase Dashboard → Authentication → Users, same as
+you've done before.
+
+## New: light/dark mode, change password, tab notes
+
+Click your name in the top-right dropdown (replaces the old plain "Sign
+out" link) for: change password, light/dark mode toggle, and sign out.
+Theme choice is saved per-browser.
+
+Every tab now has a **Notes** field anyone can see and edit — good for
+"allergic to shellfish," "wants it extra spicy," that kind of thing.
+
+## New: inventory & accounting behavior
+
+- Stock counts now only go down when a tab is actually **paid out**, not
+  while items are still sitting on an open tab — so cancelling an order no
+  longer wrongly eats into inventory.
+- Menu item names and prices are editable directly from the Inventory page.

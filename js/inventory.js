@@ -3,17 +3,15 @@ let menu = [];
 (async function init() {
   const { data } = await supabaseClient.auth.getSession();
   if (!data.session) { window.location.href = "index.html"; return; }
+  const ok = await requireApproved(data.session);
+  if (!ok) return;
   const isAdmin = await requireAdmin(data.session);
   if (!isAdmin) return;
   applyNavVisibility(data.session);
+  initProfileMenu(data.session);
+  startHeartbeat(data.session);
   await loadMenu();
 })();
-
-document.getElementById("logoutLink").addEventListener("click", async (e) => {
-  e.preventDefault();
-  await supabaseClient.auth.signOut();
-  window.location.href = "index.html";
-});
 
 async function loadMenu() {
   const { data, error } = await supabaseClient
@@ -30,13 +28,36 @@ function render() {
     const row = document.createElement("tr");
 
     const nameTd = document.createElement("td");
-    nameTd.textContent = m.name;
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.value = m.name;
+    nameInput.style.marginBottom = "0";
+    nameInput.addEventListener("change", async () => {
+      const val = nameInput.value.trim();
+      if (!val) { nameInput.value = m.name; return; }
+      await supabaseClient.from("menu_items").update({ name: val }).eq("id", m.id);
+      m.name = val;
+    });
+    nameTd.appendChild(nameInput);
 
     const catTd = document.createElement("td");
     catTd.textContent = m.category;
 
     const priceTd = document.createElement("td");
-    priceTd.textContent = `₱${Number(m.price).toFixed(2)}`;
+    const priceInput = document.createElement("input");
+    priceInput.type = "number";
+    priceInput.step = "0.01";
+    priceInput.min = "0";
+    priceInput.value = Number(m.price).toFixed(2);
+    priceInput.style.width = "100px";
+    priceInput.style.marginBottom = "0";
+    priceInput.addEventListener("change", async () => {
+      const val = Math.max(0, parseFloat(priceInput.value) || 0);
+      priceInput.value = val.toFixed(2);
+      await supabaseClient.from("menu_items").update({ price: val }).eq("id", m.id);
+      m.price = val;
+    });
+    priceTd.appendChild(priceInput);
 
     const stockTd = document.createElement("td");
     const stockInput = document.createElement("input");

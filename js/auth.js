@@ -2,28 +2,26 @@ const emailEl = document.getElementById("email");
 const passwordEl = document.getElementById("password");
 const errorEl = document.getElementById("error");
 const loginBtn = document.getElementById("loginBtn");
-const showSignupEl = document.getElementById("showSignup");
+const forgotPasswordEl = document.getElementById("forgotPassword");
 
-let mode = "login"; // 'login' | 'signup'
-
-// If already signed in, skip straight to the POS screen.
-supabaseClient.auth.getSession().then(({ data }) => {
-  if (data.session) window.location.href = "pos.html";
+// If already signed in (and approved), skip straight to the POS screen.
+supabaseClient.auth.getSession().then(async ({ data }) => {
+  if (data.session) {
+    const approved = await isApproved(data.session);
+    if (approved) window.location.href = "pos.html";
+    else await supabaseClient.auth.signOut();
+  }
 });
 
-showSignupEl.addEventListener("click", (e) => {
-  e.preventDefault();
-  mode = mode === "login" ? "signup" : "login";
-  loginBtn.textContent = mode === "login" ? "Sign in" : "Create account";
-  showSignupEl.textContent = mode === "login"
-    ? "Create a staff account"
-    : "Already have an account? Sign in";
-  errorEl.textContent = "";
-});
+async function isApproved(session) {
+  const { data } = await supabaseClient.from("staff").select("approved").eq("id", session.user.id).single();
+  return data && data.approved !== false;
+}
 
 loginBtn.addEventListener("click", async () => {
   const email = emailEl.value.trim();
   const password = passwordEl.value;
+  errorEl.style.color = "var(--danger)";
   errorEl.textContent = "";
 
   if (!email || !password) {
@@ -33,20 +31,18 @@ loginBtn.addEventListener("click", async () => {
 
   loginBtn.disabled = true;
   try {
-    if (mode === "login") {
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    } else {
-      const { error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) throw error;
-      errorEl.style.color = "var(--ok)";
-      errorEl.textContent = "Account created. You can sign in now.";
-      loginBtn.disabled = false;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    const approved = await isApproved(data.session);
+    if (!approved) {
+      await supabaseClient.auth.signOut();
+      errorEl.textContent = "Your account is still waiting for admin approval.";
       return;
     }
+
     window.location.href = "pos.html";
   } catch (err) {
-    errorEl.style.color = "var(--danger)";
     errorEl.textContent = err.message || "Something went wrong.";
   } finally {
     loginBtn.disabled = false;
@@ -57,7 +53,7 @@ passwordEl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") loginBtn.click();
 });
 
-document.getElementById("forgotPassword").addEventListener("click", async (e) => {
+forgotPasswordEl.addEventListener("click", async (e) => {
   e.preventDefault();
   const email = emailEl.value.trim();
   if (!email) {

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banin's Restobar POS — Employees</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <h1>🍻 Banin's Restobar</h1>
+    <nav>
+      <a href="pos.html">Tabs</a>
+      <a href="reports.html" data-admin-only>Reports</a>
+      <a href="accounting.html" data-admin-only>Accounting</a>
+      <a href="inventory.html" data-admin-only>Inventory</a>
+      <a href="employees.html" class="active" data-admin-only>Employees</a>
+      <div class="profile-menu">
+        <button class="secondary" id="profileBtn">👤 <span id="profileName">Account</span> ▾</button>
+        <div class="dropdown" id="profileDropdown">
+          <div class="dropdown-header" id="dropdownName"></div>
+          <div class="dropdown-sub" id="dropdownEmail"></div>
+          <hr/>
+          <a href="#" id="changePasswordLink">Change Password</a>
+          <a href="#" id="themeToggleLink">🌙 Dark mode</a>
+          <a href="#" id="signOutLink" class="danger-link">Sign out</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="toolbar">
+      <h3 style="margin:0">Pending approval</h3>
+      <button class="secondary" id="refreshBtn">↻ Refresh</button>
+    </div>
+    <table style="margin-bottom:28px">
+      <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Signed up</th><th></th></tr></thead>
+      <tbody id="pendingTableBody"></tbody>
+    </table>
+
+    <h3>All employees</h3>
+    <table>
+      <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead>
+      <tbody id="staffTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Activity modal -->
+  <div class="modal-backdrop" id="activityModal" style="display:none">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-header">
+        <div style="font-weight:700" id="activityTitle">Activity</div>
+        <button class="ghost" id="activityClose">✕</button>
+      </div>
+      <div class="modal-body" id="activityBody"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/employees.js"></script>
+</body>
+</html>

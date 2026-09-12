@@ -14,7 +14,18 @@
       <a href="reports.html" data-admin-only>Reports</a>
       <a href="accounting.html" data-admin-only>Accounting</a>
       <a href="inventory.html" data-admin-only>Inventory</a>
-      <a href="#" id="logoutLink">Sign out</a>
+      <a href="employees.html" data-admin-only>Employees</a>
+      <div class="profile-menu">
+        <button class="secondary" id="profileBtn">👤 <span id="profileName">Account</span> ▾</button>
+        <div class="dropdown" id="profileDropdown">
+          <div class="dropdown-header" id="dropdownName"></div>
+          <div class="dropdown-sub" id="dropdownEmail"></div>
+          <hr/>
+          <a href="#" id="changePasswordLink">Change Password</a>
+          <a href="#" id="themeToggleLink">🌙 Dark mode</a>
+          <a href="#" id="signOutLink" class="danger-link">Sign out</a>
+        </div>
+      </div>
     </nav>
   </div>
 
@@ -52,6 +63,8 @@
           <span>Total</span>
           <span id="tabTotal">₱0.00</span>
         </div>
+        <label class="hint" style="display:block; margin-top:16px;">Notes (visible to everyone on this tab)</label>
+        <textarea id="tabNotes" rows="2" placeholder="e.g. allergic to peanuts, wants extra spicy..."></textarea>
       </div>
       <div class="modal-footer">
         <button class="danger" id="deleteTabBtn" style="display:none">Delete Tab</button>
