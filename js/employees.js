@@ -1,4 +1,3 @@
-const ACTIVE_WINDOW_MINUTES = 3;
 let session = null;
 let staffList = [];
 
@@ -24,23 +23,6 @@ async function loadStaff() {
   staffList = data;
   renderPending();
   renderStaff();
-}
-
-function timeAgo(iso) {
-  if (!iso) return "Never";
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diffMs / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-function isActive(lastSeenAt) {
-  if (!lastSeenAt) return false;
-  return (Date.now() - new Date(lastSeenAt).getTime()) < ACTIVE_WINDOW_MINUTES * 60 * 1000;
 }
 
 function renderPending() {
@@ -99,12 +81,6 @@ function renderStaff() {
     });
     roleTd.appendChild(roleSelect);
 
-    const statusTd = document.createElement("td");
-    const pill = document.createElement("span");
-    pill.className = `pill ${isActive(s.last_seen_at) ? "active" : "idle"}`;
-    pill.textContent = isActive(s.last_seen_at) ? "Active now" : `Seen ${timeAgo(s.last_seen_at)}`;
-    statusTd.appendChild(pill);
-
     const lastLoginTd = document.createElement("td");
     lastLoginTd.textContent = s.last_sign_in_at ? new Date(s.last_sign_in_at).toLocaleString() : "Never";
 
@@ -132,7 +108,7 @@ function renderStaff() {
     });
 
     actionTd.append(activityBtn, revokeBtn);
-    row.append(nameTd, phoneTd, roleTd, statusTd, lastLoginTd, actionTd);
+    row.append(nameTd, phoneTd, roleTd, lastLoginTd, actionTd);
     body.appendChild(row);
   }
 }
