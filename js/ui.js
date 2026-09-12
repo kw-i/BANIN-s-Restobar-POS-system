@@ -50,7 +50,7 @@ async function applyNavVisibility(session) {
   const { data } = await supabaseClient.from("staff").select("role").eq("id", session.user.id).single();
   const isAdmin = data && data.role === "admin";
   document.querySelectorAll("[data-admin-only]").forEach(el => {
-    el.style.display = isAdmin ? "" : "none";
+    el.style.display = isAdmin ? "inline" : "none";
   });
   return isAdmin;
 }
